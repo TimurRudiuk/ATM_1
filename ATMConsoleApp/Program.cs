@@ -140,9 +140,9 @@ namespace ATMConsoleApp
         static Account AuthenticateUser(Bank bank, AutomatedTellerMachine atm, string cardNumber, string pin)
         {
             var account = bank.GetAccountByCardNumber(cardNumber);
-            if (account != null && atm.Authenticate(cardNumber, pin, account))
+            if (account != null && atm.Authenticate(cardNumber, pin, account))  // Тепер перевіряємо хешований PIN
             {
-                Console.WriteLine($"Авторизація успішна. Вітаємо, {account.FullName}!");
+                Console.WriteLine($"Authentication successful. Welcome, {account.FullName}!");
                 return account;
             }
 
