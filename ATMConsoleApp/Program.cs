@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Security.Principal;
 using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 using ATMCore;
 
 namespace ATMConsoleApp
 {
     internal class Program
     {
-        
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
@@ -18,10 +17,25 @@ namespace ATMConsoleApp
             var atm = new AutomatedTellerMachine("ATM1", "Main Street", 10000);
             bank.ATMs.Add(atm);
 
-            var account1 = new Account("1234567890", "Рудюк Тимур", "1234", 5000);
-            var account2 = new Account("9876543210", "Класний Руслан", "5678", 3000);
-            bank.Accounts.Add(account1);
-            bank.Accounts.Add(account2);
+            // Завантажуємо акаунти з файлу, якщо файл існує
+            var accountsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "accounts.json");
+            if (File.Exists(accountsFilePath))
+            {
+                var accountsJson = File.ReadAllText(accountsFilePath);
+                var accounts = JsonConvert.DeserializeObject<List<Account>>(accountsJson);
+                foreach (var account in accounts)
+                {
+                    bank.Accounts.Add(account);
+                }
+            }
+            else
+            {
+                // Створюємо акаунти, якщо файл не знайдений
+                var account1 = new Account("1234567890", "Рудюк Тимур", "1234", 5000);
+                var account2 = new Account("9876543210", "Класний Руслан", "5678", 3000);
+                bank.Accounts.Add(account1);
+                bank.Accounts.Add(account2);
+            }
 
             atm.OperationPerformed += (sender, message) => Console.WriteLine($"[ATM Message]: {message}");
 
@@ -110,6 +124,10 @@ namespace ATMConsoleApp
 
                     case "0":
                         Console.WriteLine("До побачення!");
+                        // Зберігаємо акаунти в файл перед виходом
+                        var accountsToSave = bank.Accounts;
+                        var accountsJson = JsonConvert.SerializeObject(accountsToSave, Formatting.Indented);
+                        File.WriteAllText(accountsFilePath, accountsJson);
                         return;
 
                     default:

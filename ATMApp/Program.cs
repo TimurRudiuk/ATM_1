@@ -21,8 +21,8 @@ namespace ATMApp
             Bank bank = new Bank("Your Bank Name");
             AutomatedTellerMachine atm = new AutomatedTellerMachine("ATM1", "Downtown", 10000);
 
-            bank.Accounts.Add(new Account("1234567890", "Рудюк Тимур", "1234", 5000));
-            bank.Accounts.Add(new Account("9876543210", "Класний Руслан", "5678", 3000));
+            bank.LoadAccountsFromJson("accounts.json");
+            bank.LoadAccountsFromJson("accounts.json");
 
             Application.Run(new Authentication(bank, atm));
         }
