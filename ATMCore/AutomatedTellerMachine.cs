@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,9 +22,19 @@ namespace ATMCore
             CashAvailable = initialCash;
         }
 
+        private string HashPin(string pinCode)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(pinCode));
+                return Convert.ToBase64String(hashBytes);
+            }
+        }
+
+
         public bool Authenticate(string cardNumber, string pinCode, Account account)
         {
-            if (account.CardNumber == cardNumber && account.PinCode == pinCode)
+            if (account.CardNumber == cardNumber && account.PinHash == HashPin(pinCode))  // Перевіряємо хеш
             {
                 OperationPerformed?.Invoke(this, "Authentication successful.");
                 return true;
@@ -31,7 +42,7 @@ namespace ATMCore
             else
             {
                 OperationPerformed?.Invoke(this, "Authentication failed.");
-                return false; 
+                return false;
             }
         }
 
