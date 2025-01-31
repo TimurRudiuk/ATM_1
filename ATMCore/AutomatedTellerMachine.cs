@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,6 +21,14 @@ namespace ATMCore
             ATMId = atmId;
             Location = location;
             CashAvailable = initialCash;
+        }
+
+        private void LogTransaction(string message)
+        {
+            using (StreamWriter writer = new StreamWriter("transactions.log", true))
+            {
+                writer.WriteLine($"{DateTime.Now}: {message}");
+            }
         }
 
         private string HashPin(string pinCode)
@@ -56,19 +65,21 @@ namespace ATMCore
             if (amount > account.Balance)
             {
                 OperationPerformed?.Invoke(this, "Insufficient funds.");
+                LogTransaction($"Failed withdrawal attempt: {account.CardNumber}, insufficient funds.");
             }
             else if (amount > CashAvailable)
             {
                 OperationPerformed?.Invoke(this, "ATM has insufficient cash.");
+                LogTransaction($"Failed withdrawal attempt: {account.CardNumber}, ATM cash insufficient.");
             }
             else
             {
                 account.Balance -= amount;
                 CashAvailable -= amount;
                 OperationPerformed?.Invoke(this, $"Withdrawal successful. New balance: {account.Balance:C}");
+                LogTransaction($"Successful withdrawal: {account.CardNumber}, Amount: {amount:C}");
             }
         }
-
         public void DepositFunds(Account account, decimal amount)
         {
             account.Balance += amount;
