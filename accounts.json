@@ -1,0 +1,4 @@
+[
+  { "CardNumber": "1234567890", "FullName": "Рудюк Тимур", "PinCode": "1234", "Balance": 5000 },
+  { "CardNumber": "9876543210", "FullName": "Класний Руслан", "PinCode": "5678", "Balance": 3000 }
+]
