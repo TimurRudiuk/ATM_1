@@ -45,10 +45,10 @@ namespace ATMConsoleApp
             {
                 Console.WriteLine("Ласкаво просимо до банкомата");
                 Console.Write("Введіть номер картки: ");
-                var cardNumber = Console.ReadLine();
+                var cardNumber = ReadValidatedInput();
 
                 Console.Write("Введіть PIN-код: ");
-                var pin = Console.ReadLine();
+                var pin = ReadValidatedInput();
 
                 currentAccount = AuthenticateUser(bank, atm, cardNumber, pin);
 
@@ -68,7 +68,7 @@ namespace ATMConsoleApp
                 Console.WriteLine("0. Вихід");
 
                 Console.Write("Оберіть опцію: ");
-                var choice = Console.ReadLine();
+                var choice = ReadValidatedInput();
 
                 switch (choice)
                 {
@@ -78,7 +78,7 @@ namespace ATMConsoleApp
 
                     case "2":
                         Console.Write("Введіть суму для зняття: ");
-                        if (decimal.TryParse(Console.ReadLine(), out var withdrawAmount))
+                        if (decimal.TryParse(ReadValidatedInput(), out var withdrawAmount))
                         {
                             atm.WithdrawFunds(currentAccount, withdrawAmount);
                         }
@@ -90,7 +90,7 @@ namespace ATMConsoleApp
 
                     case "3":
                         Console.Write("Введіть суму для поповнення: ");
-                        if (decimal.TryParse(Console.ReadLine(), out var depositAmount))
+                        if (decimal.TryParse(ReadValidatedInput(), out var depositAmount))
                         {
                             atm.DepositFunds(currentAccount, depositAmount);
                         }
@@ -102,12 +102,12 @@ namespace ATMConsoleApp
 
                     case "4":
                         Console.Write("Введіть номер картки отримувача: ");
-                        var toCardNumber = Console.ReadLine();
+                        var toCardNumber = ReadValidatedInput();
                         var toAccount = bank.GetAccountByCardNumber(toCardNumber);
                         if (toAccount != null)
                         {
                             Console.Write("Введіть суму для переказу: ");
-                            if (decimal.TryParse(Console.ReadLine(), out var transferAmount))
+                            if (decimal.TryParse(ReadValidatedInput(), out var transferAmount))
                             {
                                 atm.TransferFunds(currentAccount, toAccount, transferAmount);
                             }
@@ -147,6 +147,20 @@ namespace ATMConsoleApp
             }
 
             return null;
+        }
+
+        static string ReadValidatedInput()
+        {
+            string input;
+            do
+            {
+                input = Console.ReadLine()?.Trim();
+                if (string.IsNullOrEmpty(input))
+                {
+                    Console.WriteLine("Введене значення не може бути порожнім. Спробуйте ще раз.");
+                }
+            } while (string.IsNullOrEmpty(input));
+            return input;
         }
     }
 }
